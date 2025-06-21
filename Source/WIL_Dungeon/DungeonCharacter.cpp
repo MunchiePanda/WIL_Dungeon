@@ -40,8 +40,8 @@ ADungeonCharacter::ADungeonCharacter()
     Stats->DamageModifier = 0.0f;
     Stats->MaxStamina = 10.0f;
     Stats->CurrentStamina = Stats->MaxStamina;
-    Stats->WalkSpeed = 10.0f;
-    Stats->SprintSpeed = 30.0f;
+    Stats->WalkSpeed = 400.0f;
+    Stats->SprintSpeed = 800.0f;
     Stats->CarryCapacity = 16;  //4x4 grid
     Stats->BaseAttack = 10.0f;
     Stats->AttackModifier = 0.0f;
@@ -104,6 +104,7 @@ void ADungeonCharacter::LookRight(float Value)
 
 void ADungeonCharacter::StartSprint()
 {
+    UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StartSprint(): Starting Sprint"));
     //If character has stamina left, begin sprinting
     if (Stats->CurrentStamina > 0) 
     {
@@ -125,6 +126,7 @@ void ADungeonCharacter::StartSprint()
 
 void ADungeonCharacter::StopSprint()
 {
+    UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StopSprint(): StoppingSprint"));
     GetCharacterMovement()->MaxWalkSpeed = Stats->WalkSpeed;
 }
 
