@@ -6,6 +6,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "CharacterStatsComp.h"
 #include "DungeonCharacter.generated.h"
 
 class USpringArmComponent;
@@ -27,12 +28,16 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UCameraComponent* Camera;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+    UCharacterStatsComp* Stats;     //Custom UActorComponent to hold Character's Stats
+
 protected:
     void MoveForward(float Value);
     void MoveRight(float Value);
     void LookUp(float Value);
     void LookRight(float Value);
 
-    void StartSprint() { GetCharacterMovement()->MaxWalkSpeed *= 2.0f; }
-    void StopSprint() { GetCharacterMovement()->MaxWalkSpeed /= 2.0f; }
+    void StartSprint(); 
+    void StopSprint();
+    FTimerHandle StaminaDrainTimer;
 };

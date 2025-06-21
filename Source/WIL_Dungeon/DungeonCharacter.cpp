@@ -32,6 +32,19 @@ ADungeonCharacter::ADungeonCharacter()
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
     bUseControllerRotationRoll = false;
+
+    // Create Stats Component & set defaults
+    Stats = CreateDefaultSubobject<UCharacterStatsComp>(TEXT("Stats"));
+    Stats->MaxHealth = 100.0f;
+    Stats->CurrentHealth = Stats->MaxHealth;
+    Stats->DamageModifier = 0.0f;
+    Stats->MaxStamina = 10.0f;
+    Stats->CurrentStamina = Stats->MaxStamina;
+    Stats->WalkSpeed = 10.0f;
+    Stats->SprintSpeed = 30.0f;
+    Stats->CarryCapacity = 16;  //4x4 grid
+    Stats->BaseAttack = 10.0f;
+    Stats->AttackModifier = 0.0f;
 }
 
 void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -88,3 +101,31 @@ void ADungeonCharacter::LookRight(float Value)
         AddControllerYawInput(Value);
     }
 }
+
+void ADungeonCharacter::StartSprint()
+{
+    //If character has stamina left, begin sprinting
+    if (Stats->CurrentStamina > 0) 
+    {
+        GetCharacterMovement()->MaxWalkSpeed = Stats->SprintSpeed;
+
+        // Start stamina drain every 1 second, if drained, stop sprinting
+        GetWorld()->GetTimerManager().SetTimer(StaminaDrainTimer, [this]()
+        {
+            bool bDrained = Stats->DrainStamina(1.0f);     //How much stamina to drain
+            if (!bDrained)
+            {
+                GetWorld()->GetTimerManager().ClearTimer(StaminaDrainTimer);
+                StopSprint();
+            }
+        },
+        1.0f, true);
+    } 
+}
+
+void ADungeonCharacter::StopSprint()
+{
+    GetCharacterMovement()->MaxWalkSpeed = Stats->WalkSpeed;
+}
+
+
