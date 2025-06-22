@@ -3,7 +3,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Actor.h"
 #include "TimerManager.h"
+#include "NavigationSystem.h"
 
 AD_Generator::AD_Generator()
 {
@@ -123,6 +125,21 @@ void AD_Generator::BeginAsyncGeneration(const FVector2D& ExitPoint)
             bIsGenerating = false;
             LoadingIndicator->SetVisibility(false); // Hide loading indicator
             OnGenerationComplete.Broadcast(); // Notify completion
+
+            // --- Simple enemy spawn ---
+            if (EnemyToSpawn)
+            {
+                FVector EnemyLocation = FVector((Cols / 2) * TileSize, (Rows / 2) * TileSize, 100.0f);
+                FActorSpawnParameters SpawnParams;
+                AActor* Spawned = GetWorld()->SpawnActor<AActor>(EnemyToSpawn, EnemyLocation, FRotator::ZeroRotator, SpawnParams);
+                if (APawn* Pawn = Cast<APawn>(Spawned))
+                {
+                    if (!Pawn->GetController())
+                    {
+                        Pawn->SpawnDefaultController();
+                    }
+                }
+            }
         }), 2.0f, false); // 2-second delay for demo; adjust as needed
 }
 
@@ -295,5 +312,22 @@ void AD_Generator::SpawnExitPortal()
         if (ExitPortalMaterial) PortalComp->SetMaterial(0, ExitPortalMaterial);
         PortalComp->SetWorldLocation(PortalLocation + FVector(0, 0, 50.0f));
         DungeonObjects.Add(PortalComp);
+    }
+}
+
+void AD_Generator::SpawnEnemyAtCenter()
+{
+    if (EnemyToSpawn)
+    {
+        FVector EnemyLocation = FVector((Cols / 2) * TileSize, (Rows / 2) * TileSize, 100.0f);
+        FActorSpawnParameters SpawnParams;
+        AActor* Spawned = GetWorld()->SpawnActor<AActor>(EnemyToSpawn, EnemyLocation, FRotator::ZeroRotator, SpawnParams);
+        if (APawn* Pawn = Cast<APawn>(Spawned))
+        {
+            if (!Pawn->GetController())
+            {
+                Pawn->SpawnDefaultController();
+            }
+        }
     }
 }

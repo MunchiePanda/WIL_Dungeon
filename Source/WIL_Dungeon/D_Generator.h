@@ -19,6 +19,8 @@ public:
     void GenerateDungeonFromDoor(const FVector2D& ExitPoint);
     UFUNCTION(BlueprintCallable)
     void ClearDungeon();
+    UFUNCTION(BlueprintCallable, Category = "Dungeon")
+    void SpawnEnemyAtCenter();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon")
     int32 Rows;
@@ -78,6 +80,10 @@ public:
     UMaterialInterface* ExitPortalMaterial;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Objects")
     int32 MaxTechScrapPerRoom;
+
+    // Enemy class to spawn after generation
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemies")
+    TSubclassOf<AActor> EnemyToSpawn;
 
 protected:
     UPROPERTY(VisibleAnywhere)
