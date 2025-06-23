@@ -31,11 +31,13 @@ void UCharacterStatsComp::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 bool UCharacterStatsComp::DrainStamina(float DrainAmount)
 {
+	//RETURN bDrained
 	if (CurrentStamina <= 0)
 	{
 		return true;    //return true if Drained
 	}
-	CurrentStamina -= DrainAmount * StaminaDrainModifier;
+	UE_LOG(LogTemp, Log, TEXT("DRAINING STAMINA! Current: %f"), CurrentStamina);
+	CurrentStamina = CurrentStamina - DrainAmount;	//(Add later: DrainAmount * DrainModifier 
 	FMath::Clamp(CurrentStamina, 0, MaxStamina);
 	return false;
 }
