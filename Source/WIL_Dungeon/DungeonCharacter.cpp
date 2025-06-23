@@ -37,14 +37,17 @@ ADungeonCharacter::ADungeonCharacter()
     Stats = CreateDefaultSubobject<UCharacterStatsComp>(TEXT("Stats"));
     Stats->MaxHealth = 100.0f;
     Stats->CurrentHealth = Stats->MaxHealth;
-    Stats->DamageModifier = 0.0f;
+    Stats->MaxSystemExposure = 100;
+    Stats->CurrentSystemExposure = Stats->MaxSystemExposure;
+    Stats->DamageModifier = 1.0f;       //100%
     Stats->MaxStamina = 10.0f;
     Stats->CurrentStamina = Stats->MaxStamina;
+    Stats->StaminaRecoveryRate = 0.5f;
     Stats->WalkSpeed = 400.0f;
     Stats->SprintSpeed = 800.0f;
     Stats->CarryCapacity = 16;  //4x4 grid
     Stats->BaseAttack = 10.0f;
-    Stats->AttackModifier = 0.0f;
+    Stats->AttackModifier = 1.0f;   //100%
 }
 
 void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -104,30 +107,42 @@ void ADungeonCharacter::LookRight(float Value)
 
 void ADungeonCharacter::StartSprint()
 {
-    UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StartSprint(): Starting Sprint"));
+    GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
     //If character has stamina left, begin sprinting
     if (Stats->CurrentStamina > 0) 
     {
+        UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StartSprint(): Starting Sprint"));
         GetCharacterMovement()->MaxWalkSpeed = Stats->SprintSpeed;
 
         // Start stamina drain every 1 second, if drained, stop sprinting
-        GetWorld()->GetTimerManager().SetTimer(StaminaDrainTimer, [this]()
+        GetWorld()->GetTimerManager().SetTimer(StaminaTimer, [this]()
         {
-            bool bDrained = Stats->DrainStamina(1.0f);     //How much stamina to drain
-            if (!bDrained)
+            bool bDrained = Stats->DrainStamina(0.1f);     //How much stamina to drain
+            if (bDrained)
             {
-                GetWorld()->GetTimerManager().ClearTimer(StaminaDrainTimer);
+                GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
                 StopSprint();
             }
         },
-        1.0f, true);
+        0.1f, true);
     } 
 }
 
 void ADungeonCharacter::StopSprint()
 {
     UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StopSprint(): StoppingSprint"));
+    
     GetCharacterMovement()->MaxWalkSpeed = Stats->WalkSpeed;
+    // Start stamina drain every 1 second, if drained, stop sprinting
+    GetWorld()->GetTimerManager().SetTimer(StaminaTimer, [this]()
+        {
+            bool bRecovered = Stats->RecoverStamina();     //How much stamina to drain
+            if (bRecovered)
+            {
+                GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
+            }
+        },
+        1.0f, true);
 }
 
 
