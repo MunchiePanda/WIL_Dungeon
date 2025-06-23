@@ -42,6 +42,7 @@ ADungeonCharacter::ADungeonCharacter()
     Stats->DamageModifier = 1.0f;       //100%
     Stats->MaxStamina = 10.0f;
     Stats->CurrentStamina = Stats->MaxStamina;
+    Stats->StaminaRecoveryRate = 0.5f;
     Stats->WalkSpeed = 400.0f;
     Stats->SprintSpeed = 800.0f;
     Stats->CarryCapacity = 16;  //4x4 grid
@@ -136,7 +137,7 @@ void ADungeonCharacter::StopSprint()
     GetWorld()->GetTimerManager().SetTimer(StaminaTimer, [this]()
         {
             bool bRecovered = Stats->RecoverStamina();     //How much stamina to drain
-            if (!bRecovered)
+            if (bRecovered)
             {
                 GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
             }

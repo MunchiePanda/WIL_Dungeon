@@ -44,12 +44,14 @@ bool UCharacterStatsComp::DrainStamina(float DrainAmount)
 
 bool UCharacterStatsComp::RecoverStamina()
 {
-	if (CurrentStamina <= MaxStamina)
+	//return bRecovered
+	if (CurrentStamina >= MaxStamina)
 	{
-		CurrentStamina += StaminaRecoveryRate;
-		FMath::Clamp(CurrentStamina, 0, MaxStamina);
 		return true;    //return true if recovered
 	}
+	UE_LOG(LogTemp, Log, TEXT("RECOVERING STAMINA! Current: %f"), CurrentStamina);
+	CurrentStamina += StaminaRecoveryRate;
+	FMath::Clamp(CurrentStamina, 0, MaxStamina);
 	return false;
 }
 
