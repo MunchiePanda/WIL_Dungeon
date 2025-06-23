@@ -37,6 +37,8 @@ ADungeonCharacter::ADungeonCharacter()
     Stats = CreateDefaultSubobject<UCharacterStatsComp>(TEXT("Stats"));
     Stats->MaxHealth = 100.0f;
     Stats->CurrentHealth = Stats->MaxHealth;
+    Stats->MaxSystemExposure = 100;
+    Stats->CurrentSystemExposure = Stats->MaxSystemExposure;
     Stats->DamageModifier = 0.0f;
     Stats->MaxStamina = 10.0f;
     Stats->CurrentStamina = Stats->MaxStamina;
@@ -104,6 +106,7 @@ void ADungeonCharacter::LookRight(float Value)
 
 void ADungeonCharacter::StartSprint()
 {
+    GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
     UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StartSprint(): Starting Sprint"));
     //If character has stamina left, begin sprinting
     if (Stats->CurrentStamina > 0) 
@@ -111,12 +114,12 @@ void ADungeonCharacter::StartSprint()
         GetCharacterMovement()->MaxWalkSpeed = Stats->SprintSpeed;
 
         // Start stamina drain every 1 second, if drained, stop sprinting
-        GetWorld()->GetTimerManager().SetTimer(StaminaDrainTimer, [this]()
+        GetWorld()->GetTimerManager().SetTimer(StaminaTimer, [this]()
         {
             bool bDrained = Stats->DrainStamina(1.0f);     //How much stamina to drain
             if (!bDrained)
             {
-                GetWorld()->GetTimerManager().ClearTimer(StaminaDrainTimer);
+                GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
                 StopSprint();
             }
         },
@@ -127,7 +130,18 @@ void ADungeonCharacter::StartSprint()
 void ADungeonCharacter::StopSprint()
 {
     UE_LOG(LogTemp, Log, TEXT("ADungeonCharacter StopSprint(): StoppingSprint"));
+    
     GetCharacterMovement()->MaxWalkSpeed = Stats->WalkSpeed;
+    // Start stamina drain every 1 second, if drained, stop sprinting
+    GetWorld()->GetTimerManager().SetTimer(StaminaTimer, [this]()
+        {
+            bool bRecovered = Stats->RecoverStamina();     //How much stamina to drain
+            if (!bRecovered)
+            {
+                GetWorld()->GetTimerManager().ClearTimer(StaminaTimer); //stop previous Stamina timer
+            }
+        },
+        1.0f, true);
 }
 
 

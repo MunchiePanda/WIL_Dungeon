@@ -33,6 +33,11 @@ public:
 	float DamageModifier;	//percentage of attack that player takes
 							//eg. EnemyAttack * 0.90 = DamageDone -> CurrentHealth -= DamageDone
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float MaxSystemExposure;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float CurrentSystemExposure;
+
 	//Stamina: Depleted as character attacks, sprints, dodges, jumping
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
 	float MaxStamina;
@@ -62,9 +67,16 @@ public:
 	
 	UFUNCTION()
 	bool DrainStamina(float DrainAmount);
-
 	UFUNCTION()
 	bool RecoverStamina();
+
+	UFUNCTION()
+	bool IncreaseSystemExposure();
+
+	UFUNCTION()
+	void DrainHealth(float DrainAmount);
+
+
 
 private:
 	bool bStaminaDraining;	//if stamina is currently being drained

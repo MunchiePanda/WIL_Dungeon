@@ -39,5 +39,5 @@ protected:
 
     void StartSprint(); 
     void StopSprint();
-    FTimerHandle StaminaDrainTimer;
+    FTimerHandle StaminaTimer;
 };

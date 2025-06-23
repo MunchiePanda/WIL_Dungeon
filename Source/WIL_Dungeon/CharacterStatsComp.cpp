@@ -44,9 +44,29 @@ bool UCharacterStatsComp::RecoverStamina()
 {
 	if (CurrentStamina <= MaxStamina)
 	{
-		CurrentStamina -= StaminaRecoveryRate;
+		CurrentStamina += StaminaRecoveryRate;
 		FMath::Clamp(CurrentStamina, 0, MaxStamina);
 		return true;    //return true if recovered
 	}
 	return false;
 }
+
+bool UCharacterStatsComp::IncreaseSystemExposure()
+{
+	if (CurrentSystemExposure < MaxSystemExposure) 
+	{
+		CurrentSystemExposure -= 1.0f;
+		return false;
+	}
+	return true;	//is increased to max (begin health drain)
+}
+
+void UCharacterStatsComp::DrainHealth(float DrainAmount)
+{
+	if (CurrentHealth <= MaxHealth)
+	{
+		CurrentHealth -= DrainAmount;
+		FMath::Clamp(CurrentStamina, 0, MaxStamina);
+	}
+}
+
