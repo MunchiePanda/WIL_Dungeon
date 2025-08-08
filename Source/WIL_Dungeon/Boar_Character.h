@@ -15,6 +15,6 @@ class WIL_DUNGEON_API ABoar_Character : public AEnemy_Character
 	GENERATED_BODY()
 
 protected:
-	virtual void OnDamaged(float DamageAmount, AActor* DamageCauser) override;
+	virtual void OnDamaged(float DamageAmount, AActor* DamageCauser);
 	void ChargePlayer(AActor* DamageCauser);
 };

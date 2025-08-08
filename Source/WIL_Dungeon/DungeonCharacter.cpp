@@ -48,6 +48,12 @@ ADungeonCharacter::ADungeonCharacter()
     Stats->CarryCapacity = 16;  //4x4 grid
     Stats->BaseAttack = 10.0f;
     Stats->AttackModifier = 1.0f;   //100%
+
+    // Create Inventory Component
+    Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+
+    // Create Advanced Combat Component
+    //AdvancedCombat = CreateDefaultSubobject<UAdvancedCombatComponent>(TEXT("AdvancedCombat"));
 }
 
 void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,6 +71,18 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	// Bind action input for sprinting
     PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADungeonCharacter::StartSprint);
     PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADungeonCharacter::StopSprint);
+
+    // Bind advanced combat inputs
+    //PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ADungeonCharacter::OnLightAttack);
+    //PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ADungeonCharacter::OnHeavyAttack);
+    //PlayerInputComponent->BindAction("Block", IE_Pressed, this, &ADungeonCharacter::OnStartBlock);
+    //PlayerInputComponent->BindAction("Block", IE_Released, this, &ADungeonCharacter::OnEndBlock);
+    //PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &ADungeonCharacter::OnDodge);
+    //PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ADungeonCharacter::OnStartAim);
+    //PlayerInputComponent->BindAction("Aim", IE_Released, this, &ADungeonCharacter::OnEndAim);
+    //PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ADungeonCharacter::OnFire);
+    //PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ADungeonCharacter::OnReload);
+    //PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &ADungeonCharacter::OnSwitchFireMode);
 }
 
 void ADungeonCharacter::MoveForward(float Value)
@@ -144,5 +162,100 @@ void ADungeonCharacter::StopSprint()
         },
         1.0f, true);
 }
+
+// Advanced Combat Input Functions
+/*
+void ADungeonCharacter::OnLightAttack()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->PerformAttack(EAttackType::Light);
+    }
+}
+
+void ADungeonCharacter::OnHeavyAttack()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->PerformAttack(EAttackType::Heavy);
+    }
+}
+
+void ADungeonCharacter::OnStartBlock()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->StartBlock();
+    }
+}
+
+void ADungeonCharacter::OnEndBlock()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->EndBlock();
+    }
+}
+
+void ADungeonCharacter::OnDodge()
+{
+    if (AdvancedCombat)
+    {
+        // Get dodge direction based on movement input
+        FVector DodgeDirection = GetVelocity().GetSafeNormal();
+        if (DodgeDirection.IsNearlyZero())
+        {
+            DodgeDirection = GetActorForwardVector();
+        }
+        AdvancedCombat->PerformDodge(DodgeDirection);
+    }
+}
+
+void ADungeonCharacter::OnStartAim()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->SetCombatCamera(true);
+    }
+}
+
+void ADungeonCharacter::OnEndAim()
+{
+    if (AdvancedCombat)
+    {
+        AdvancedCombat->SetCombatCamera(false);
+    }
+}
+
+void ADungeonCharacter::OnFire()
+{
+    if (AdvancedCombat)
+    {
+        // This would typically be handled by the weapon system
+        // For now, we'll use it as a special attack
+        AdvancedCombat->PerformAttack(EAttackType::Special);
+    }
+}
+
+void ADungeonCharacter::OnReload()
+{
+    if (AdvancedCombat)
+    {
+        // This would typically be handled by the weapon system
+        // For now, we'll use it to reset combos
+        AdvancedCombat->ResetCombo();
+    }
+}
+
+void ADungeonCharacter::OnSwitchFireMode()
+{
+    if (AdvancedCombat)
+    {
+        // This would typically be handled by the weapon system
+        // For now, we'll use it to start combos
+        AdvancedCombat->StartCombo();
+    }
+}
+*/
 
 
