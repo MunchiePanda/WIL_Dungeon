@@ -4,6 +4,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "InventoryWidget.h"
+#include "ItemBase.h"
 
 ADungeonCharacter::ADungeonCharacter()
 {
@@ -56,6 +59,21 @@ ADungeonCharacter::ADungeonCharacter()
     //AdvancedCombat = CreateDefaultSubobject<UAdvancedCombatComponent>(TEXT("AdvancedCombat"));
 }
 
+void ADungeonCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if (Inventory)
+    {
+        Inventory->OnItemAdded.AddDynamic(this, &ADungeonCharacter::HandleItemAdded);
+        Inventory->OnItemRemoved.AddDynamic(this, &ADungeonCharacter::HandleItemRemoved);
+        Inventory->OnItemUsed.AddDynamic(this, &ADungeonCharacter::HandleItemUsed);
+        Inventory->OnItemEquipped.AddDynamic(this, &ADungeonCharacter::HandleItemEquipped);
+        Inventory->OnItemUnequipped.AddDynamic(this, &ADungeonCharacter::HandleItemUnequipped);
+        Inventory->OnInventoryChanged.AddDynamic(this, &ADungeonCharacter::HandleInventoryChanged);
+    }
+}
+
 void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     // Bind axis inputs for movement and looking
@@ -83,6 +101,96 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     //PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ADungeonCharacter::OnFire);
     //PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ADungeonCharacter::OnReload);
     //PlayerInputComponent->BindAction("SwitchFireMode", IE_Pressed, this, &ADungeonCharacter::OnSwitchFireMode);
+    // Toggle Inventory (requires action mapping "Inventory")
+    PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &ADungeonCharacter::ToggleInventory);
+}
+void ADungeonCharacter::HandleItemAdded(UItemBase* Item)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+
+void ADungeonCharacter::HandleItemRemoved(UItemBase* Item)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+
+void ADungeonCharacter::HandleItemUsed(UItemBase* Item)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+
+void ADungeonCharacter::HandleItemEquipped(UItemBase* Item)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+
+void ADungeonCharacter::HandleItemUnequipped(UItemBase* Item)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+
+void ADungeonCharacter::HandleInventoryChanged(int32 SlotIndex)
+{
+    if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+    {
+        InvWidget->RebuildInventoryUI();
+    }
+}
+void ADungeonCharacter::ToggleInventory()
+{
+    if (!InventoryWidgetClass)
+    {
+        return;
+    }
+
+    if (!InventoryWidgetInstance)
+    {
+        InventoryWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), InventoryWidgetClass);
+
+        if (UInventoryWidget* InvWidget = Cast<UInventoryWidget>(InventoryWidgetInstance))
+        {
+            InvWidget->BindToInventory(Inventory);
+        }
+    }
+
+    APlayerController* PC = Cast<APlayerController>(GetController());
+
+    if (InventoryWidgetInstance->IsInViewport())
+    {
+        InventoryWidgetInstance->RemoveFromParent();
+        if (PC)
+        {
+            PC->bShowMouseCursor = false;
+            PC->SetInputMode(FInputModeGameOnly());
+        }
+    }
+    else
+    {
+        InventoryWidgetInstance->AddToViewport(50);
+        if (PC)
+        {
+            PC->bShowMouseCursor = true;
+            FInputModeGameAndUI Mode;
+            Mode.SetHideCursorDuringCapture(false);
+            Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PC->SetInputMode(Mode);
+        }
+    }
 }
 
 void ADungeonCharacter::MoveForward(float Value)
